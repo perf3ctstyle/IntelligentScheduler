@@ -5,6 +5,10 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractService<T> {
 
+    public abstract T getById(long id);
+    public abstract void create(T entity);
+    public abstract void delete(long id);
+
     protected void checkPaginationParameters(int page, int pageSize) {
         if (page <= 0 || pageSize <= 0) {
             throw new IllegalArgumentException();
@@ -18,8 +22,4 @@ public abstract class AbstractService<T> {
                 .limit(limit)
                 .collect(Collectors.toList());
     }
-
-    public abstract T getById(long id);
-    public abstract void create(T entity);
-    public abstract void delete(long id);
 }
