@@ -9,6 +9,9 @@ import by.bsuir.intelligentscheduler.service.UserService;
 import by.bsuir.intelligentscheduler.validator.ProjectValidator;
 import by.bsuir.intelligentscheduler.validator.TaskValidator;
 import by.bsuir.intelligentscheduler.validator.UserValidator;
+import org.jmantic.api.context.DefaultScContext;
+import org.jmantic.scmemory.model.ScMemory;
+import org.jmantic.scmemory.websocketmemory.sync.SyncOstisScMemory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -16,24 +19,37 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 @Configuration
 @ComponentScan("by.bsuir.intelligentscheduler")
 @EnableWebMvc
 public class ApplicationConfig implements WebMvcConfigurer {
 
     @Bean
-    public ProjectDao projectDao() {
-        return new ProjectDao();
+    public ScMemory scMemory() throws URISyntaxException {
+        return new SyncOstisScMemory(new URI("ws://localhost:8090/ws_json"));
     }
 
     @Bean
-    public TaskDao taskDao() {
-        return new TaskDao();
+    public DefaultScContext defaultScContext(ScMemory scMemory) {
+        return new DefaultScContext(scMemory);
     }
 
     @Bean
-    public UserDao userDao() {
-        return new UserDao();
+    public ProjectDao projectDao(ScMemory scMemory, DefaultScContext scContext) {
+        return new ProjectDao(scMemory, scContext);
+    }
+
+    @Bean
+    public TaskDao taskDao(ScMemory scMemory, DefaultScContext scContext) {
+        return new TaskDao(scMemory, scContext);
+    }
+
+    @Bean
+    public UserDao userDao(ScMemory scMemory, DefaultScContext scContext) {
+        return new UserDao(scMemory, scContext);
     }
 
     @Bean

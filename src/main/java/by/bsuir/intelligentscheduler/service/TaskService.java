@@ -25,14 +25,6 @@ public class TaskService extends AbstractService<Task> {
         this.taskValidator = taskValidator;
     }
 
-    /**
-     * Returns {@link Task} objects from a database without any filtering of a particular {@link User}.
-     *
-     * @param userId - {@link User} id
-     * @param page  - the number of a page to show.
-     * @param pageSize - the number of {@link Task} objects on a page.
-     * @return a {@link List} of {@link Task} objects.
-     */
     public List<Task> getAllByUserId(long userId, int page, int pageSize) {
         checkPaginationParameters(page, pageSize);
         List<Task> tasks = taskDao.getAllByUserId(userId);
@@ -40,35 +32,16 @@ public class TaskService extends AbstractService<Task> {
         return getPaginated(tasks, pageSize, (page-1)*pageSize);
     }
 
-    /**
-     * Returns a {@link Task} object from a database by its id or throws {@link ResourceNotFoundException}
-     * if nothing is retrieved from a database.
-     *
-     * @param id - the {@link Task} object's id that is to be retrieved from a database.
-     * @return {@link Task} object.
-     */
     public Task getById(long id) {
-        Optional<Task> optionalOrder = taskDao.getById(id);
-        return optionalOrder.orElseThrow(() -> new ResourceNotFoundException());
+        Optional<Task> optionalTask = taskDao.getById(id);
+        return optionalTask.orElseThrow(() -> new ResourceNotFoundException());
     }
 
-    /**
-     * Creates a {@link Task} object in a database or throws {@link RequiredFieldsMissingException} if some fields
-     * required for creation are missing.
-     *
-     * @param task - the {@link Task} object that is to be created in a database.
-     */
     public void create(Task task) {
         taskValidator.validateForCreation(task);
         taskDao.create(task);
     }
 
-    /**
-     * Deletes a {@link Task} object in a database by its id or throws {@link ResourceNotFoundException} if the object
-     * with such id doesn't exist.
-     *
-     * @param id - the {@link Task} object's id that is to be deleted in a database.
-     */
     public void delete(long id) {
         Optional<Task> optionalTask = taskDao.getById(id);
         Task task = optionalTask.orElseThrow(() -> new ResourceNotFoundException());

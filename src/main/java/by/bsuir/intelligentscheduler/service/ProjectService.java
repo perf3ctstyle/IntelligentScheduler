@@ -25,14 +25,6 @@ public class ProjectService extends AbstractService<Project> {
         this.projectValidator = projectValidator;
     }
 
-    /**
-     * Returns {@link Project} objects from a database without any filtering of a particular {@link User}.
-     *
-     * @param userId - {@link User} id
-     * @param page  - the number of a page to show.
-     * @param pageSize - the number of {@link Project} objects on a page.
-     * @return a {@link List} of {@link Project} objects.
-     */
     public List<Project> getAllByUserId(long userId, int page, int pageSize) {
         checkPaginationParameters(page, pageSize);
         List<Project> projects = projectDao.getAllByUserId(userId);
@@ -40,35 +32,16 @@ public class ProjectService extends AbstractService<Project> {
         return getPaginated(projects, pageSize, (page-1)*pageSize);
     }
 
-    /**
-     * Returns a {@link Project} object from a database by its id or throws {@link ResourceNotFoundException}
-     * if nothing is retrieved from a database.
-     *
-     * @param id - the {@link Project} object's id that is to be retrieved from a database.
-     * @return {@link Project} object.
-     */
     public Project getById(long id) {
-        Optional<Project> optionalOrder = projectDao.getById(id);
-        return optionalOrder.orElseThrow(() -> new ResourceNotFoundException());
+        Optional<Project> optionalProject = projectDao.getById(id);
+        return optionalProject.orElseThrow(() -> new ResourceNotFoundException());
     }
 
-    /**
-     * Creates a {@link Project} object in a database or throws {@link RequiredFieldsMissingException} if some fields
-     * required for creation are missing.
-     *
-     * @param project - the {@link Project} object that is to be created in a database.
-     */
     public void create(Project project) {
         projectValidator.validateForCreation(project);
         projectDao.create(project);
     }
 
-    /**
-     * Deletes a {@link Project} object in a database by its id or throws {@link ResourceNotFoundException} if the object
-     * with such id doesn't exist.
-     *
-     * @param id - the {@link Project} object's id that is to be deleted in a database.
-     */
     public void delete(long id) {
         Optional<Project> optionalProject = projectDao.getById(id);
         Project project = optionalProject.orElseThrow(() -> new ResourceNotFoundException());
